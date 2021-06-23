@@ -6,7 +6,7 @@ const passport = require('passport');
 const Joi = require('joi');
 
 const router = express.Router();
-const Book = require('../models/book')
+const Book = require('./models/book')
 
 
 router.post('/new_book_to_library', passport.authenticate(jwt, {session: false}), (req, res)=>{
