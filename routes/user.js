@@ -6,6 +6,24 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/User')
 const Joi = require('joi');
 
+
+
+router.get('/', (req, res, next) =>{
+   //res.send('debit route');
+  
+  
+    User.find().select(['-password'])
+    .then(users => {
+    
+          return res.status(200).json(users) 
+       
+      })
+});
+    
+   
+
+
+
 router.post('/login', (req, res) =>{
 
     //validate data
@@ -47,11 +65,7 @@ router.post('/login', (req, res) =>{
       if (err){
         console.log(err);
       }
-      console.log(` ${user} `)
-      // if(user.password !== value.password){
-      //   res.status(401).json({msg: 'User does not exist'})
-      //   return;
-      // }
+      
       bcrypt.compare(value.password, user.password, (err, isMatch) =>{
         
         if(err) throw err
@@ -141,10 +155,6 @@ router.post('/register', (req, res, next) =>{
        });
     });
    
-      
-
-   
-  
 
    
 });
