@@ -23,7 +23,7 @@ mongoose.connect(dbURL,
   console.log("Connected to database");
 });
 
-
+console.log(__dirname);
 
 
 app.listen(3000, () => {
