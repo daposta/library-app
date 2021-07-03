@@ -70,7 +70,7 @@ router.post('/login', (req, res) =>{
         
         if(err) throw err
         if(isMatch){
-          const _jwt = jsonwebtoken.sign( {sub: user.id,  iat: Date.now()}, process.env.JWT_SECRET);
+          const _jwt = jsonwebtoken.sign( {id: user.id,  iat: Date.now()}, process.env.JWT_SECRET);
           res.send({msg: 'Login successful', token:_jwt , expires_in: '1d'})
         }else{
           res.send({msg: 'No user with credentials'});
