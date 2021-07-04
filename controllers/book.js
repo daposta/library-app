@@ -2,21 +2,38 @@ const express = require('express');
 const Joi = require('joi');
 const Book = require('../models/book')
 
-const getAllBooks = (req, res)=>{
-    Book.find().then(books => {
-    
-          return res.status(200).json(books) 
-       
-      });
+const getAllBooks = async (req, res)=>{
+      try{
+        const books = await Book.find()
+      return res.status(200).json({success: false, books: books})
+    }catch(err){
+      return res.status(500).json({success: false, msg: err})
+    }
+
 
 };
 
-const getABook = (req, res)=>{
-    Book.findByID(id).then(book => {
+const getABook = async (req, res)=>{
+  
+  try{
+      const {id:bookID} = req.params;
+      console.log(`xxx ${bookID}`)
+      const book = await Book.findOne({_id:bookID});
+      //console.log(book);
+      if (!book){
+        return res.status(404).json({success: false, msg: `No task with id:  ${bookID}`})
+      }
+
+       res.status(200).json({success:true, book: book})
+  }catch(err){
+    console.log(err);
+    return res.status(500).json({success: false, msg: err})
+  }
+    // Book.findByID(id).then(book => {
     
-          return res.status(200).json(book) 
+    //       return res.status(200).json(book) 
        
-      });
+    //   });
 
 }
 
@@ -32,25 +49,25 @@ const addNewBook = async (req, res) => {
       // 'string.base': `"a" should be a type of 'text'`,
       // 'string.empty': `"a" cannot be an empty field`,
       // 'string.min': `"a" should have a minimum length of {#limit}`,
-      'any.required': `Title is a required field`
+      'any.required': `title is a required field`
     }),
       author: Joi.string().min(6).required().messages({
       // 'string.base': `"a" should be a type of 'text'`,
       // 'string.empty': `"a" cannot be an empty field`,
       // 'string.min': `"a" should have a minimum length of {#limit}`,
-      'any.required': `Author is a required field`
+      'any.required': `author is a required field`
     }),
-      unit_price: Joi.string().min(6).required().messages({
+      unit_price: Joi.number().required().messages({
       // 'string.base': `"a" should be a type of 'text'`,
       // 'string.empty': `"a" cannot be an empty field`,
       // 'string.min': `"a" should have a minimum length of {#limit}`,
-      'any.required': `Author is a required field`
+      'any.required': `unit_price is a required field`
     }),
-      quantity: Joi.string().min(6).required().messages({
+      quantity: Joi.number().required().messages({
       // 'string.base': `"a" should be a type of 'text'`,
       // 'string.empty': `"a" cannot be an empty field`,
       // 'string.min': `"a" should have a minimum length of {#limit}`,
-      'any.required': `Author is a required field`
+      'any.required': `quantity is a required field`
     })
     })//.options({abortEarly : false});
 
@@ -62,7 +79,25 @@ const addNewBook = async (req, res) => {
     };
    // const { error, value } = schema.validate(req.body, options);
    const  { error, value } =  schema.validate(req.body, options);
-   const newBook = Book.create(req.body)
+   if (error) {
+      // on fail return comma separated errors
+      msgs = []
+      error.details.map(x => msgs.push(x.message));
+      
+      return res.status(400).send(msgs);
+      
+
+    }
+   value.total_cost = value.quantity  * value.unit_price;
+   try{
+      const newBook = await Book.create(value)
+      return res.status(201).json({success: true, book: newBook })
+   
+   }catch(err){
+      console.log(err)
+      return res.status(400).json({success: false, book: err })
+   }
+   
 
 
   
