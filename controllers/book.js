@@ -17,9 +17,30 @@ const getABook = async (req, res)=>{
   
   try{
       const {id:bookID} = req.params;
-      console.log(`xxx ${bookID}`)
+      
       const book = await Book.findOne({_id:bookID});
-      //console.log(book);
+           if (!book){
+        return res.status(404).json({success: false, msg: `No task with id:  ${bookID}`})
+      }
+
+       res.status(200).json({success:true, book: book})
+  }catch(err){
+    console.log(err);
+    return res.status(500).json({success: false, msg: err})
+  }
+   
+
+}
+
+
+const editBookInfo = async (req, res) =>{
+
+  try{
+      const {id:bookID} = req.params;
+      
+      const book = await Book.findOneAndUpdate({_id:bookID}, req.body, {
+        new:true, runValidators:true, useFindAndModify:false
+      });
       if (!book){
         return res.status(404).json({success: false, msg: `No task with id:  ${bookID}`})
       }
@@ -29,16 +50,6 @@ const getABook = async (req, res)=>{
     console.log(err);
     return res.status(500).json({success: false, msg: err})
   }
-    // Book.findByID(id).then(book => {
-    
-    //       return res.status(200).json(book) 
-       
-    //   });
-
-}
-
-
-const editBookInfo = (req, res) =>{
 
 };
 
