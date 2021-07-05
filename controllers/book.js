@@ -1,21 +1,20 @@
 const express = require('express');
 const Joi = require('joi');
 const Book = require('../models/book')
+const asyncWrapper = require('../middlewares/asyncwrapper');
 
-const getAllBooks = async (req, res)=>{
-      try{
+const getAllBooks = asyncWrapper(async (req, res)=>{
+      
         const books = await Book.find()
-      return res.status(200).json({success: false, books: books})
-    }catch(err){
-      return res.status(500).json({success: false, msg: err})
-    }
+      return res.status(200).json({success: true, books: books})
+    
 
 
-};
+});
 
-const getABook = async (req, res)=>{
+const getABook = asyncWrapper(async (req, res)=>{
   
-  try{
+  
       const {id:bookID} = req.params;
       
       const book = await Book.findOne({_id:bookID});
@@ -24,18 +23,14 @@ const getABook = async (req, res)=>{
       }
 
        res.status(200).json({success:true, book: book})
-  }catch(err){
-    console.log(err);
-    return res.status(500).json({success: false, msg: err})
-  }
-   
+ 
 
-}
+})
 
 
-const editBookInfo = async (req, res) =>{
+const editBookInfo = asyncWrapper(async (req, res) =>{
 
-  try{
+  
       const {id:bookID} = req.params;
       
       const book = await Book.findOneAndUpdate({_id:bookID}, req.body, {
@@ -46,14 +41,11 @@ const editBookInfo = async (req, res) =>{
       }
 
        res.status(200).json({success:true, book: book})
-  }catch(err){
-    console.log(err);
-    return res.status(500).json({success: false, msg: err})
-  }
+ 
 
-};
+});
 
-const addNewBook = async (req, res) => {
+const addNewBook = asyncWrapper(async (req, res) => {
   //validate data
     const schema = Joi.object({
       title: Joi.string().required().messages({
@@ -100,19 +92,13 @@ const addNewBook = async (req, res) => {
 
     }
    value.total_cost = value.quantity  * value.unit_price;
-   try{
+  
       const newBook = await Book.create(value)
       return res.status(201).json({success: true, book: newBook })
    
-   }catch(err){
-      console.log(err)
-      return res.status(400).json({success: false, book: err })
-   }
+ 
    
-
-
-  
-}
+})
 
 module.exports = {
   getAllBooks, getABook, editBookInfo, addNewBook
